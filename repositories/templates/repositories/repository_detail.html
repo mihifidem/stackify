@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {{ repository.name }}
+    </title>
+</head>
+
+<body>
+
+    <p>
+        <a href="{% url 'repositories:repository_list' %}">
+            ← Volver a repositorios
+        </a>
+    </p>
+
+    <h1>
+        {{ repository.name }}
+    </h1>
+
+    <p>
+        Propietario:
+        {{ repository.owner.username }}
+    </p>
+
+    <p>
+        {{ repository.description }}
+    </p>
+
+    <p>
+        Visibilidad:
+        {{ repository.get_visibility_display }}
+    </p>
+
+
+    <hr>
+
+
+    <h2>
+        Proyectos
+    </h2>
+
+    {% if repository.projects.all %}
+
+        <ul>
+
+            {% for project in repository.projects.all %}
+
+                <li>
+
+                    <strong>
+                        {{ project.title }}
+                    </strong>
+
+                    <br>
+
+                    Tipo:
+                    {{ project.get_project_type_display }}
+
+                    {% if project.description %}
+
+                        <br>
+
+                        {{ project.description }}
+                        <a href="{{ project.file }}">Descargar archivo  </a>
+                    {% endif %}
+                                            <a href="{{ project.file.url }}">Descargar archivo  </a>
+
+
+                </li>
+
+                <br>
+
+            {% endfor %}
+
+        </ul>
+
+    {% else %}
+
+        <p>
+            Este repositorio todavía no tiene proyectos.
+        </p>
+
+    {% endif %}
+
+</body>
+
+</html>

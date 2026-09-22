@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Repositorios</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        form { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; margin: 20px 0; }
+        .field { display: flex; flex-direction: column; }
+        .filters { margin-bottom: 20px; }
+        .repo-item { border: 1px solid #ddd; padding: 12px; margin-bottom: 12px; border-radius: 8px; }
+        .pagination { margin-top: 20px; }
+        .pagination a, .pagination span { margin-right: 8px; }
+    </style>
+</head>
+<body>
+    <h1>Repositorios</h1>
+
+    <form method="get" class="filters">
+        <div class="field">
+            <label for="search">Buscar</label>
+            <input type="text" id="search" name="search" value="{{ search }}" placeholder="Nombre, propietario o descripción">
+        </div>
+
+        <div class="field">
+            <label for="visibility">Visibilidad</label>
+            <select id="visibility" name="visibility">
+                <option value="">Todas</option>
+                {% for value, label in visibility_choices %}
+                    <option value="{{ value }}" {% if visibility == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="field">
+            <label for="ordering">Ordenar por</label>
+            <select id="ordering" name="ordering">
+                {% for key, label in allowed_ordering.items %}
+                    <option value="{{ key }}" {% if ordering == key %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button type="submit">Filtrar</button>
+    </form>
+
+    {% if repositories %}
+        <ul style="list-style:none; padding:0;">
+            {% for repository in repositories %}
+                <li class="repo-item">
+                    <strong>
+                        <a href="{% url 'repositories:repository_detail' repository.owner.username repository.slug %}">{{ repository.name }}</a>
+                    </strong>
+                    <br>
+                    Propietario: {{ repository.owner.username }}
+                    <br>
+                    {{ repository.description|default:"Sin descripción." }}
+                    <br>
+                    Visibilidad: {{ repository.get_visibility_display }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No se encontraron repositorios con esos filtros.</p>
+    {% endif %}
+
+    {% if page_obj.paginator.num_pages > 1 %}
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?search={{ search }}&visibility={{ visibility }}&ordering={{ ordering }}&page={{ page_obj.previous_page_number }}">Anterior</a>
+            {% endif %}
+
+            <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+
+            {% if page_obj.has_next %}
+                <a href="?search={{ search }}&visibility={{ visibility }}&ordering={{ ordering }}&page={{ page_obj.next_page_number }}">Siguiente</a>
+            {% endif %}
+        </div>
+    {% endif %}
+</body>
+</html>
